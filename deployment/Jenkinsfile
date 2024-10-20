@@ -1,4 +1,5 @@
-@Library('pipeline_shared_library')
+@Library('pipeline_shared_library') _
+def commonFunctions = commonFunctions(this)
 
 def SRC_DIR = "subride-front"
 def PIPELINE_ID = "${SRC_DIR}-${env.BUILD_NUMBER}"
