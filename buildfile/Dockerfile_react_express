@@ -18,10 +18,10 @@ ENV REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
 # Non-root user로 실행하기 위해 user 생성  
 ENV USERNAME ubuntu
 ENV HOME_DIR /home/ubuntu
-RUN useradd -m -d ${HOME_DIR} -s /bin/bash -g users -G sudo -u 1000 ${USERNAME}
+RUN useradd -m -d ${HOME_DIR} -s /bin/bash -g users -G sudo ${USERNAME}
 
 # 작업 디렉토리를 /app으로 설정합니다.
-WORKDIR ${HOME_DIR}
+WORKDIR ${HOME_DIR}/app
 
 # package.json과 package-lock.json을 작업 디렉토리에 복사합니다.
 COPY ${PROJECT_FOLDER}/package*.json .
