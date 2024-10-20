@@ -213,7 +213,7 @@ podTemplate(
                                     git config user.name "Jenkins"
                                     git add ${MANIFEST_DIR}/${MANIFEST_FILENAME}
                                     git commit -m "Update ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
-                                    git push https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
+                                    git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
                                 """
                             } catch (e) {
                                 echo "Error occurred while push Deploy yaml. but keep going: ${e}"
