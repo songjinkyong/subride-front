@@ -4,7 +4,7 @@ def commonFunctions = commonFunctions(this)
 def SRC_DIR = "subride-front"
 def PIPELINE_ID = "${SRC_DIR}-${env.BUILD_NUMBER}"
 
-stage("Prepare Environment") {
+//stage("Prepare Environment") {
     podTemplate(
         label: "${PIPELINE_ID}",
         containers: [
@@ -28,9 +28,9 @@ stage("Prepare Environment") {
             }
         }
     }
-}
+//}
 
-stage("Build and Deploy") {
+//stage("Build and Deploy") {
     podTemplate(
         label: "${PIPELINE_ID}",
         containers: [
@@ -189,4 +189,4 @@ stage("Build and Deploy") {
             }
         }
     }
-}
+//}
