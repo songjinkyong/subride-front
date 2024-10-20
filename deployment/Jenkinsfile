@@ -122,6 +122,26 @@ podTemplate(
                 }
             }
 
+            stage("Release Container image") {
+                container("podman") {
+                    withCredentials([usernamePassword(
+                        credentialsId: "${IMAGE_REG_CREDENTIAL}",
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD'
+                    )]) {
+                        sh """
+                            echo user "$USERNAME" pasword "$PASSWORD"
+                            podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
+
+                            podman push ${IMAGE_PATH}:${IMAGE_TAG}
+
+                            podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
+                            podman push ${IMAGE_PATH}:latest
+                        """
+                    }
+                }
+            }            
+            
             if(!skipStages.contains("trivy")) {
                 stage("Scan Image Vulnerability") {
                     timeout(time: 10, unit: 'MINUTES') {
@@ -155,26 +175,6 @@ podTemplate(
                     }
                 }
             }
-
-            stage("Release Container image") {
-                container("podman") {
-                    withCredentials([usernamePassword(
-                        credentialsId: "${IMAGE_REG_CREDENTIAL}",
-                        usernameVariable: 'USERNAME',
-                        passwordVariable: 'PASSWORD'
-                    )]) {
-                        sh """
-                            echo user "$USERNAME" pasword "$PASSWORD"
-                            podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
-
-                            podman push ${IMAGE_PATH}:${IMAGE_TAG}
-
-                            podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
-                            podman push ${IMAGE_PATH}:latest
-                        """
-                    }
-                }
-            }            
         
             stage( "Generate deployment yaml" ) {
                 container("envsubst") {
