@@ -1,5 +1,5 @@
 # 베이스 이미지로 Node.js 14 버전을 사용합니다.
-FROM --platform=linux/amd64 node:14
+FROM --platform=linux/amd64 node:latest
 # 보안 업데이트 적용: upgrade안하면 image 보안 취약성 검사 실패할 수 있음  
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -30,7 +30,6 @@ RUN npm install --only=production
 # 소스 코드를 작업 디렉토리에 복사합니다.
 COPY ./${PROJECT_FOLDER}/src ./src
 COPY ./${PROJECT_FOLDER}/public ./public
-#COPY ./${PROJECT_FOLDER}/node_modules .
 
 # React 애플리케이션을 빌드합니다.
 RUN npm run build
@@ -40,6 +39,10 @@ ENV PORT=${EXPORT_PORT}
 
 # 포트를 노출합니다.
 EXPOSE $PORT
+
+# 비 root 사용자로 실행
+RUN adduser -D ubuntu
+USER ubuntu
 
 # 서버 시작 스크립트를 실행합니다.
 CMD ["node", "server.js"]
