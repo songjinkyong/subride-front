@@ -1,8 +1,8 @@
 @Library('pipeline_shared_library') _
 def commonFunctions = commonFunctions(this)
 
-def SRC_DIR = "subride-front"
-def PIPELINE_ID = "${SRC_DIR}-${env.BUILD_NUMBER}"
+def SERVICE_ID = "subride-front"
+def PIPELINE_ID = "${SERVICE_ID}-${env.BUILD_NUMBER}"
 
 //=== 사전 준비 작업 ==
 podTemplate(
@@ -21,7 +21,7 @@ podTemplate(
                         mkdir -p ~/.ssh
                         ssh-keyscan -H ${NFS_HOST} >> ~/.ssh/known_hosts
                         
-                        ssh -i ${SSH_KEY_FILE} ${SSH_USER}@${NFS_HOST} "sudo mkdir -p /${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}"
+                        ssh -i ${SSH_KEY_FILE} ${SSH_USER}@${NFS_HOST} "sudo mkdir -p /${NFS_DIR}/${TRIVY_CACHE_DIR}/${SERVICE_ID}"
                         
                     """
                 }
@@ -42,7 +42,7 @@ podTemplate(
         containerTemplate(name: 'envsubst', image: "hiondal/envsubst", command: 'sleep', args: '1h')
     ],
     volumes: [
-        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false),
+        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SERVICE_ID}", readOnly: false),
         //nfsVolume(mountPath: "/etc/containers/registries.conf.d", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/registries.conf.d", readOnly: true)
     ]
 )
@@ -199,8 +199,8 @@ podTemplate(
 
             if("${USE_ARGOCD}" == "true") {
                 stage("Update manifest") {
-                    withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                        sh "git clone https://${GIT_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO}"
+                    withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_TOKEN')]) {
+                        sh "git clone https://${GIT_USERNAME}:${GIT_TOKEN}@${MANIFEST_REPO}"
 
                         sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
                         sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
@@ -213,7 +213,7 @@ podTemplate(
                                     git config user.name "Jenkins"
                                     git add ${MANIFEST_DIR}/${MANIFEST_FILENAME}
                                     git commit -m "Update ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
-                                    git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
+                                    git push https://${GIT_USERNAME}:${GIT_TOKEN}@${MANIFEST_REPO} HEAD:main
                                 """
                             } catch (e) {
                                 echo "Error occurred while push Deploy yaml. but keep going: ${e}"
