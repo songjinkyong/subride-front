@@ -16,7 +16,7 @@ MANIFEST_DIR=manifest
 # manifest 파일 환경 변수 
 APP_NAME=subride-front
 NAMESPACE=user15
-REPLICAS=1
+REPLICAS=2
 SERVICE_ACCOUNT=sa-user15
 IMAGE_PULL_SECRET=dockerhub  
 IMAGE_REG_HOST=docker.io
