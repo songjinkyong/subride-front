@@ -38,7 +38,6 @@ podTemplate(
         containerTemplate(name: "kubectl", image: "lachlanevenson/k8s-kubectl", command: "cat", ttyEnabled: true),
         containerTemplate(name: "node", image: "node:22.2.0-alpine3.20", ttyEnabled: true, command: "cat"),
         containerTemplate(name: 'sonar-scanner', image: 'sonarsource/sonar-scanner-cli', ttyEnabled: true, command: 'cat'),
-        //containerTemplate(name: 'podman', image: "mgoltzsche/podman", ttyEnabled: true, command: 'cat', privileged: true),
         containerTemplate(name: 'podman', image: "quay.io/podman/stable", ttyEnabled: true, command: 'cat', privileged: true),
         containerTemplate(name: 'envsubst', image: "hiondal/envsubst", command: 'sleep', args: '1h')
     ],
