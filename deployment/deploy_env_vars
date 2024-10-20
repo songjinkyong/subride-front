@@ -2,7 +2,7 @@
 IMAGE_REG_CREDENTIAL=image_reg_credential_user15
 MANIFEST_FILENAME=subride-front.yaml
 IMAGE_SCAN_SEVERITY=CRITICAL,HIGH
-API_GATEWAY_FQDN=user15.scg.msa.edutdc.com
+API_GATEWAY_FQDN=http://user15.scg.msa.edutdc.com
 IMAGE_MANIFEST_DIR=buildfile
 PROJECT_DIR=.
 USE_ARGOCD=false

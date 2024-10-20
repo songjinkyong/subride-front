@@ -43,7 +43,7 @@ podTemplate(
     ],
     volumes: [
         nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false),
-        nfsVolume(mountPath: "/etc/containers/registries.conf.d", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/registries.conf.d", readOnly: true)
+        //nfsVolume(mountPath: "/etc/containers/registries.conf.d", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/registries.conf.d", readOnly: true)
     ]
 )
 {
@@ -56,20 +56,27 @@ podTemplate(
 
         BASEDIR = "./deployment"
         def props = readProperties  file:"${BASEDIR}/deploy_env_vars"
-        APP_NAME = props["APP_NAME"]
-        IMAGE_REG_HOST = props["IMAGE_REG_HOST"]
-        IMAGE_REG_ORG = props["IMAGE_REG_ORG"]
-        IMAGE_TAG = props["IMAGE_TAG"]
-        NAMESPACE = props["NAMESPACE"]
-        IMAGE_REG_CREDENTIAL = props["IMAGE_REG_CREDENTIAL"]
-        MANIFEST_FILENAME = props["MANIFEST_FILENAME"]
-        IMAGE_SCAN_SEVERITY = props["IMAGE_SCAN_SEVERITY"]
-        API_GATEWAY_FQDN = props["API_GATEWAY_FQDN"]
-        IMAGE_MANIFEST_DIR = props["IMAGE_MANIFEST_DIR"]
-        PROJECT_DIR = props["PROJECT_DIR"]
-        SERVICE_PORT = props["SERVICE_PORT"]
-
+        APP_NAME =              props["APP_NAME"]
+        IMAGE_REG_HOST =        props["IMAGE_REG_HOST"]
+        IMAGE_REG_ORG =         props["IMAGE_REG_ORG"]
+        IMAGE_TAG =             props["IMAGE_TAG"]
+        NAMESPACE =             props["NAMESPACE"]
+        IMAGE_REG_CREDENTIAL =  props["IMAGE_REG_CREDENTIAL"]
+        MANIFEST_FILENAME =     props["MANIFEST_FILENAME"]
+        IMAGE_SCAN_SEVERITY =   props["IMAGE_SCAN_SEVERITY"]
+        API_GATEWAY_FQDN =      props["API_GATEWAY_FQDN"]
+        IMAGE_MANIFEST_DIR =    props["IMAGE_MANIFEST_DIR"]
+        PROJECT_DIR =           props["PROJECT_DIR"]
+        SERVICE_PORT =          props["SERVICE_PORT"]
+        USE_ARGOCD =            props["USE_ARGOCD"]
+        
         def IMAGE_PATH = "${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}"
+
+        //-- ArgoCD 연동 시에만 필요 
+        MANIFEST_REPO =         props["MANIFEST_REPO"]
+        MANIFEST_REPO_DIR =     props["MANIFEST_REPO_DIR"]
+        MANIFEST_DIR =          props["MANIFEST_DIR"]
+        GIT_ACCESS_CREDENTIAL = props["GIT_ACCESS_CREDENTIAL"]
 
         //-- 개발 시 CI/CD를 빠르게 하기 위해 일부 Stage Skip(sonar,trivy)
         def skipStages = "sonar,trivy"
@@ -142,7 +149,7 @@ podTemplate(
                         """
                     }
                 }
-            }            
+            }  
 
             if(!skipStages.contains("trivy")) {
                 stage("Scan Image Vulnerability") {
@@ -185,15 +192,43 @@ podTemplate(
                         source ${BASEDIR}/deploy_env_vars
                         set +a
 
-                        envsubst < ${BASEDIR}/${MANIFEST_FILENAME}.template > ${BASEDIR}/${MANIFEST_FILENAME}
+                        envsubst < ${BASEDIR}/deploy.yaml.template > ${BASEDIR}/${MANIFEST_FILENAME}
                         cat ${BASEDIR}/${MANIFEST_FILENAME}
                     """
                 }
             }
 
-            stage( "Deploy to Cluster" ) {
-                container("kubectl") {
-                    sh "kubectl apply -f ${BASEDIR}/${MANIFEST_FILENAME} -n ${NAMESPACE}"
+            if("${USE_ARGOCD}" == "true") {
+                stage("Update manifest") {
+                    withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+                        sh "git clone https://${GIT_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO}"
+
+                        sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
+                        sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
+
+                        dir("${MANIFEST_REPO_DIR}") {
+                            try {
+                                sh """
+                                    git checkout -B main
+                                    git config user.email "jenkins@gmail.com"
+                                    git config user.name "Jenkins"
+                                    git add ${MANIFEST_DIR}/${MANIFEST_FILENAME}
+                                    git commit -m "Update ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
+                                    git push https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
+                                """
+                            } catch (e) {
+                                echo "Error occurred while push Deploy yaml. but keep going: ${e}"
+                            }
+                        }
+
+                    }
+                }           
+
+            } else {
+                stage( "Deploy to Cluster" ) {
+                    container("kubectl") {
+                        sh "kubectl apply -f ${BASEDIR}/${MANIFEST_FILENAME} -n ${NAMESPACE}"
+                    }
                 }
             }
 
@@ -201,6 +236,7 @@ podTemplate(
             echo "**** FINISH ALL STAGES : SUCCESS"
         } catch(e) {
             currentBuild.result = "FAILED"
+            echo "Error occurred: ${e}"
             commonFunctions.notifySlack("${currentBuild.currentResult}", "#FF0000")
         }
     }
