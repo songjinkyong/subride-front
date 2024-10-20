@@ -194,17 +194,20 @@ podTemplate(
                     """
                 }
             }
-
+/*
+            stage( "Deploy to Cluster" ) {
+                container("kubectl") {
+                    sh "kubectl apply -f ${BASEDIR}/${MANIFEST_FILENAME} -n ${NAMESPACE}"
+                }
+            }
+*/
             stage("Update manifest") {
                 withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                     sh "git clone https://${GIT_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO}"
-                }
-                sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
-                sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
-            }           
 
-            stage("Push to Git") {
-                withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                    sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
+                    sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
+
                     dir("${MANIFEST_REPO_DIR}") {
                         try {
                             sh """
@@ -219,9 +222,10 @@ podTemplate(
                             echo "Error occurred while push Deploy yaml. but keep going: ${e}"
                         }
                     }
+
                 }
-            }
-            
+            }           
+
             commonFunctions.notifySlack("${currentBuild.currentResult}", "#00FF00")
             echo "**** FINISH ALL STAGES : SUCCESS"
         } catch(e) {
