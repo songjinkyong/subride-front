@@ -59,7 +59,7 @@ podTemplate(
         APP_NAME =              props["APP_NAME"]
         IMAGE_REG_HOST =        props["IMAGE_REG_HOST"]
         IMAGE_REG_ORG =         props["IMAGE_REG_ORG"]
-        IMAGE_TAG =             props["IMAGE_TAG"]
+        IMAGE_TAG =             commonFunctions.getImageTag()
         NAMESPACE =             props["NAMESPACE"]
         IMAGE_REG_CREDENTIAL =  props["IMAGE_REG_CREDENTIAL"]
         MANIFEST_FILENAME =     props["MANIFEST_FILENAME"]
@@ -143,9 +143,6 @@ podTemplate(
                             podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
 
                             podman push ${IMAGE_PATH}:${IMAGE_TAG}
-
-                            podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
-                            podman push ${IMAGE_PATH}:latest
                         """
                     }
                 }
@@ -191,6 +188,8 @@ podTemplate(
                         set -a
                         source ${BASEDIR}/deploy_env_vars
                         set +a
+
+                        export IMAGE_TAG=${IMAGE_TAG}
 
                         envsubst < ${BASEDIR}/deploy.yaml.template > ${BASEDIR}/${MANIFEST_FILENAME}
                         cat ${BASEDIR}/${MANIFEST_FILENAME}

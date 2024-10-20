@@ -22,7 +22,7 @@ spec:
         - name: ${IMAGE_PULL_SECRET}
       containers:
         - name: ${APP_NAME}
-          image: ${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}:latest
+          image: ${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}:${IMAGE_TAG}
           imagePullPolicy: ${IMAGE_PULL_POLICY}
           envFrom:
           - configMapRef:
