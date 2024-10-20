@@ -198,7 +198,7 @@ podTemplate(
                 }
             }
 
-            if(${USE_ARGOCD} == "true") {
+            if("${USE_ARGOCD}" == "true") {
                 stage("Update manifest") {
                     withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                         sh "git clone https://${GIT_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO}"
@@ -236,6 +236,7 @@ podTemplate(
             echo "**** FINISH ALL STAGES : SUCCESS"
         } catch(e) {
             currentBuild.result = "FAILED"
+            echo "Error occurred: ${e}"
             commonFunctions.notifySlack("${currentBuild.currentResult}", "#FF0000")
         }
     }
