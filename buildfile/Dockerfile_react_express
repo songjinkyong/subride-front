@@ -1,6 +1,6 @@
 # 베이스 이미지로 Node.js 14 버전을 사용합니다.
 FROM --platform=linux/amd64 node:14
-# 보안 업데이트 적용: 
+# 보안 업데이트 적용: upgrade안하면 image 보안 취약성 검사 실패할 수 있음  
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get clean && \
