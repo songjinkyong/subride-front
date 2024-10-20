@@ -187,7 +187,7 @@ podTemplate(
                         source ${BASEDIR}/deploy_env_vars
                         set +a
 
-                        envsubst < ${BASEDIR}/${MANIFEST_FILENAME}.template > ${BASEDIR}/${MANIFEST_FILENAME}
+                        envsubst < ${BASEDIR}/deploy.yaml.template > ${BASEDIR}/${MANIFEST_FILENAME}
                         cat ${BASEDIR}/${MANIFEST_FILENAME}
                     """
                 }
