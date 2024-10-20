@@ -62,6 +62,7 @@ podTemplate(
         IMAGE_TAG =             props["IMAGE_TAG"]
         NAMESPACE =             props["NAMESPACE"]
         IMAGE_REG_CREDENTIAL =  props["IMAGE_REG_CREDENTIAL"]
+        MANIFEST_REPO =         props["MANIFEST_REPO"]
         MANIFEST_DIR =          props["MANIFEST_DIR"]
         MANIFEST_FILENAME =     props["MANIFEST_FILENAME"]
         IMAGE_SCAN_SEVERITY =   props["IMAGE_SCAN_SEVERITY"]
