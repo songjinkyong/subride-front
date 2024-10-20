@@ -43,7 +43,8 @@ podTemplate(
         containerTemplate(name: 'envsubst', image: "hiondal/envsubst", command: 'sleep', args: '1h')
     ],
     volumes: [
-        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false)
+        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false),
+        nfsVolume(mountPath: "/etc/containers/registries.conf.d", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/registries.conf.d", readOnly: true)
     ]
 )
 {
