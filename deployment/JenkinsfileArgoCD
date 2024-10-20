@@ -140,7 +140,7 @@ podTemplate(
                                     podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
                                 """, returnStatus: true)
 
-                                if (loginStatus == 0) {
+                                if (loginStatus) {
                                     loginSuccess = true
                                     return
                                 } else {
@@ -210,6 +210,14 @@ podTemplate(
                     """
                 }
             }
+
+/* 
+            stage( "Deploy to Cluster" ) {
+                container("kubectl") {
+                    sh "kubectl apply -f ${BASEDIR}/${MANIFEST_FILENAME} -n ${NAMESPACE}"
+                }
+            }
+*/
 
             stage("Update ${MANIFEST_FILENAME}") {
                 sh "git clone https://${MANIFEST_REPO}"
