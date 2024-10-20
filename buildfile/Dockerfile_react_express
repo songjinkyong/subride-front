@@ -1,6 +1,6 @@
 # 베이스 이미지로 Node.js 14 버전을 사용합니다.
 FROM --platform=linux/amd64 node:14
-# 보안 업데이트 적용
+# 보안 업데이트 적용: 
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get clean && \
@@ -30,6 +30,7 @@ RUN npm ci --only=production
 # 소스 코드를 작업 디렉토리에 복사합니다.
 COPY ./${PROJECT_FOLDER}/src .
 COPY ./${PROJECT_FOLDER}/public .
+COPY ./${PROJECT_FOLDER}/node_modules .
 
 # React 애플리케이션을 빌드합니다.
 RUN npm run build

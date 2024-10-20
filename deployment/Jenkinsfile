@@ -76,7 +76,7 @@ podTemplate(
             stage("Build React Scripts") {
                 container("node") {
                     sh """
-                        npm install --only=production
+                        npm ci --only=production
                         npm run build --watch --watch-options-aggregate-timeout 1000
                     """
                 }
