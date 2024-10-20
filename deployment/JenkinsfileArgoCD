@@ -209,8 +209,8 @@ podTemplate(
                                 git checkout -B main
                                 git config user.email "jenkins@gmail.com"
                                 git config user.name "Jenkins"
-                                git add ${MANIFEST_DIR}/${MANIFEST_FILENAME}
-                                git commit -m "Update ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
+                                git add ${MANIFEST_FILENAME}
+                                git commit -m "Update ${MANIFEST_FILENAME}"
                                 git push https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
                             """
                         } catch (e) {
