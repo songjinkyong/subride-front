@@ -9,7 +9,8 @@ PROJECT_DIR=.
 # ArgoCD 이용 시 
 GIT_ACCESS_CREDENTIAL=github_access_token_user15
 MANIFEST_REPO=github.com/hiondal/subrecommend-manifest.git
-MANIFEST_DIR=subrecommend-manifest
+MANIFEST_REPO_DIR=subrecommend-manifest
+MANIFEST_DIR=manifest
 
 # manifest 파일 환경 변수 
 APP_NAME=subride-front

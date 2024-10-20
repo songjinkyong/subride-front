@@ -63,6 +63,7 @@ podTemplate(
         NAMESPACE =             props["NAMESPACE"]
         IMAGE_REG_CREDENTIAL =  props["IMAGE_REG_CREDENTIAL"]
         MANIFEST_REPO =         props["MANIFEST_REPO"]
+        MANIFEST_REPO_DIR =     props["MANIFEST_REPO_DIR"]
         MANIFEST_DIR =          props["MANIFEST_DIR"]
         MANIFEST_FILENAME =     props["MANIFEST_FILENAME"]
         IMAGE_SCAN_SEVERITY =   props["IMAGE_SCAN_SEVERITY"]
@@ -199,19 +200,19 @@ podTemplate(
                     sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${MANIFEST_REPO}"
                 }
                 
-                sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
+                sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
             }           
 
             stage("Push to Git") {
                 withCredentials([usernamePassword(credentialsId: '${GIT_ACCESS_CREDENTIAL}', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
-                    dir("${MANIFEST_DIR}") {
+                    dir("${MANIFEST_REPO_DIR}") {
                         try {
                             sh """
                                 git checkout -B main
                                 git config user.email "jenkins@gmail.com"
                                 git config user.name "Jenkins"
-                                git add ${MANIFEST_FILENAME}
-                                git commit -m "Update ${MANIFEST_FILENAME}"
+                                git add ${MANIFEST_DIR}/${MANIFEST_FILENAME}
+                                git commit -m "Update ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
                                 git push https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} HEAD:main
                             """
                         } catch (e) {
