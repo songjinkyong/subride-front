@@ -196,15 +196,15 @@ podTemplate(
             }
 
             stage("Update manifest") {
-                withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${MANIFEST_REPO}"
+                withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+                    sh "git clone https://${GIT_USERNAME}:${GITHUB_TOKEN}@${MANIFEST_REPO}"
                 }
                 sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
                 sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
             }           
 
             stage("Push to Git") {
-                withCredentials([usernamePassword(credentialsId: '${GIT_ACCESS_CREDENTIAL}', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
                     dir("${MANIFEST_REPO_DIR}") {
                         try {
                             sh """
