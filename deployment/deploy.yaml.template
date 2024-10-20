@@ -31,7 +31,7 @@ spec:
               name: ${APP_NAME}
           ports:
             - name: container-port
-              containerPort: ${CONTAINER_PORT}
+              containerPort: ${SERVICE_PORT}
           resources:
             requests:
               cpu: ${CPU_REQUEST}
@@ -52,14 +52,14 @@ spec:
           readinessProbe:
             httpGet:
               path: ${READINESS_PATH}
-              port: ${READINESS_PORT}
+              port: ${SERVICE_PORT}
               scheme: ${READINESS_SCHEME}
             periodSeconds: ${READINESS_PERIOD}
             failureThreshold: ${READINESS_FAILURE_THRESHOLD} 
           livenessProbe:
             httpGet:
               path: ${LIVENESS_PATH}
-              port: ${LIVENESS_PORT}
+              port: ${SERVICE_PORT}
               scheme: ${LIVENESS_SCHEME}  
             periodSeconds: ${LIVENESS_PERIOD}
             failureThreshold: ${LIVENESS_FAILURE_THRESHOLD}
@@ -93,7 +93,7 @@ spec:
   ports:
     - name: ${APP_NAME}
       port: ${SERVICE_PORT}  
-      targetPort: ${SERVICE_TARGET_PORT}
+      targetPort: ${SERVICE_PORT}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress  
@@ -113,4 +113,4 @@ spec:
               service:
                 name: ${APP_NAME}
                 port:
-                  number: ${INGRESS_PORT}
+                  number: ${SERVICE_PORT}

@@ -63,6 +63,9 @@ podTemplate(
         MANIFEST_FILENAME = props["MANIFEST_FILENAME"]
         IMAGE_SCAN_SEVERITY = props["IMAGE_SCAN_SEVERITY"]
         API_GATEWAY_FQDN = props["API_GATEWAY_FQDN"]
+        IMAGE_MANIFEST_DIR = props["IMAGE_MANIFEST_DIR"]
+        PROJECT_DIR = props["PROJECT_DIR"]
+        SERVICE_PORT = props["SERVICE_PORT"]
 
         def IMAGE_PATH = "${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}"
 
@@ -108,8 +111,12 @@ podTemplate(
             stage("Build Container image") {
                 container("podman") {
                     sh """
-                        podman build -f ${BASEDIR}/Dockerfile \
-                            -t ${IMAGE_PATH}:${IMAGE_TAG} .
+                        podman build -f ${IMAGE_MANIFEST_DIR}/Dockerfile_react_express \
+                        -t ${IMAGE_PATH}:${IMAGE_TAG} \
+                        --build-arg PROJECT_FOLDER=${PROJECT_DIR} \
+                        --build-arg BUILD_FOLDER=${IMAGE_MANIFEST_DIR} \
+                        --build-arg EXPORT_PORT=${SERVICE_PORT} \
+                        ${PROJECT_DIR}
                     """
                 }
             }
