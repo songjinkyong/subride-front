@@ -199,7 +199,7 @@ podTemplate(
                 withCredentials([usernamePassword(credentialsId: "${GIT_ACCESS_CREDENTIAL}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${MANIFEST_REPO}"
                 }
-                
+                sh "mkdir -p ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}"
                 sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_REPO_DIR}/${MANIFEST_DIR}/${MANIFEST_FILENAME}"
             }           
 
