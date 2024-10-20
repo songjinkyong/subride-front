@@ -62,6 +62,7 @@ podTemplate(
         IMAGE_REG_CREDENTIAL = props["IMAGE_REG_CREDENTIAL"]
         MANIFEST_FILENAME = props["MANIFEST_FILENAME"]
         IMAGE_SCAN_SEVERITY = props["IMAGE_SCAN_SEVERITY"]
+        API_GATEWAY_FQDN = props["API_GATEWAY_FQDN"]
 
         def IMAGE_PATH = "${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}"
 
@@ -72,8 +73,8 @@ podTemplate(
             stage("Build React Scripts") {
                 container("node") {
                     sh """
-                        npm install
-
+                        export REACT_APP_API_BASE_URL=${API_GATEWAY_FQDN}
+                        npm install --only=production
                         npm run build --watch --watch-options-aggregate-timeout 1000
                     """
                 }
@@ -108,7 +109,7 @@ podTemplate(
                 container("podman") {
                     sh """
                         podman build -f ${BASEDIR}/Dockerfile \
-                            -t ${IMAGE_PATH}:${IMAGE_TAG} \
+                            -t ${IMAGE_PATH}:${IMAGE_TAG} .
                     """
                 }
             }

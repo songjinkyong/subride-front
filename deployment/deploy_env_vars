@@ -1,7 +1,8 @@
 # CI/CD pipeline 관련
 IMAGE_REG_CREDENTIAL="image_reg_credential_user15"
 MANIFEST_FILENAME="deploy.yaml"
-IMAGE_SCAN_SEVERITY = "CRITICAL,HIGH"
+IMAGE_SCAN_SEVERITY="CRITICAL,HIGH"
+API_GATEWAY_FQDN="user15.scg.msa.edutdc.com"
 
 # manifest 파일 환경 변수 
 APP_NAME=subride-front
