@@ -133,36 +133,18 @@ podTemplate(
                         usernameVariable: 'USERNAME',
                         passwordVariable: 'PASSWORD'
                     )]) {
-                        script {
-                            def loginSuccess = false
-                            retry(3) {
-                                def loginStatus = sh(script: """
-                                    podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
-                                """, returnStatus: true)
+                        sh """
+                            echo user "$USERNAME" pasword "$PASSWORD"
+                            podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
 
-                                if (loginStatus) {
-                                    loginSuccess = true
-                                    return
-                                } else {
-                                    error "Failed to login to registry. Retrying..."
-                                }
-                            }
+                            podman push ${IMAGE_PATH}:${IMAGE_TAG}
 
-                            if (!loginSuccess) {
-                                error "Failed to login after 3 attempts. Aborting."
-                            }
-
-                            // Proceed with push operations if login was successful
-                            sh """
-                                podman push ${IMAGE_PATH}:${IMAGE_TAG}
-
-                                podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
-                                podman push ${IMAGE_PATH}:latest
-                            """
-                        }
+                            podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
+                            podman push ${IMAGE_PATH}:latest
+                        """
                     }
                 }
-            }         
+            }  
 
             if(!skipStages.contains("trivy")) {
                 stage("Scan Image Vulnerability") {
@@ -210,14 +192,6 @@ podTemplate(
                     """
                 }
             }
-
-/* 
-            stage( "Deploy to Cluster" ) {
-                container("kubectl") {
-                    sh "kubectl apply -f ${BASEDIR}/${MANIFEST_FILENAME} -n ${NAMESPACE}"
-                }
-            }
-*/
 
             stage("Update ${MANIFEST_FILENAME}") {
                 sh "git clone https://${MANIFEST_REPO}"
