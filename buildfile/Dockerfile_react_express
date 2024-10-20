@@ -1,4 +1,4 @@
-# 베이스 이미지로 Node.js 14 버전을 사용합니다.
+# 베이스 이미지로 Node.js 최신 버전을 사용합니다.
 FROM --platform=linux/amd64 node:latest
 # 보안 업데이트 적용: upgrade안하면 image 보안 취약성 검사 실패할 수 있음  
 RUN apt-get update && \
@@ -14,9 +14,14 @@ ARG EXPORT_PORT
 # API G/W 호출 주소 환경변수 셋팅 
 ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
-    
+
+# Non-root user로 실행하기 위해 user 생성  
+ENV USERNAME ubuntu
+ENV HOME_DIR /home/ubuntu
+RUN useradd -m -d ${HOME_DIR} -s /bin/bash -g users -G sudo -u 1000 ${USERNAME}
+
 # 작업 디렉토리를 /app으로 설정합니다.
-WORKDIR /app
+WORKDIR ${HOME_DIR}
 
 # package.json과 package-lock.json을 작업 디렉토리에 복사합니다.
 COPY ${PROJECT_FOLDER}/package*.json .
@@ -41,8 +46,7 @@ ENV PORT=${EXPORT_PORT}
 EXPOSE $PORT
 
 # 비 root 사용자로 실행
-RUN adduser -D ubuntu
-USER ubuntu
+USER ${USERNAME}
 
 # 서버 시작 스크립트를 실행합니다.
 CMD ["node", "server.js"]
