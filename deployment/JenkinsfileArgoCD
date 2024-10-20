@@ -197,7 +197,7 @@ podTemplate(
                 sh "git clone https://${MANIFEST_REPO}"
                 
                 // 기존 파일 교체
-                sh "mkdir -p ${MANIFEST_DIR}"
+                //sh "mkdir -p ${MANIFEST_DIR}"
                 sh "cp -f ${BASEDIR}/${MANIFEST_FILENAME} ${MANIFEST_DIR}/${MANIFEST_FILENAME}"
             }
 
