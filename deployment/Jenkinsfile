@@ -20,8 +20,10 @@ podTemplate(
                     sh """
                         mkdir -p ~/.ssh
                         ssh-keyscan -H ${NFS_HOST} >> ~/.ssh/known_hosts
-                        cat ${SSH_KEY_FILE}
+                        
                         ssh -i ${SSH_KEY_FILE} ${SSH_USER}@${NFS_HOST} "sudo mkdir -p /${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}"
+                        ssh -i ${SSH_KEY_FILE} ${SSH_USER}@${NFS_HOST} "sudo mkdir -p /${NFS_DIR}/${CONTAINER_IMAGE_DIR}/${SRC_DIR}"
+                        
                     """
                 }
             }
@@ -41,7 +43,8 @@ podTemplate(
         containerTemplate(name: 'envsubst', image: "hiondal/envsubst", command: 'sleep', args: '1h')
     ],
     volumes: [
-        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false)
+        nfsVolume(mountPath: "/${TRIVY_CACHE_DIR}", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${TRIVY_CACHE_DIR}/${SRC_DIR}", readOnly: false),
+        nfsVolume(mountPath: "/var/lib/containers", serverAddress: "${NFS_HOST}", serverPath: "/${NFS_DIR}/${CONTAINER_IMAGE_DIR}/${SRC_DIR}", readOnly: false)
     ]
 )
 {
@@ -141,7 +144,7 @@ podTemplate(
                     }
                 }
             }            
-            
+
             if(!skipStages.contains("trivy")) {
                 stage("Scan Image Vulnerability") {
                     timeout(time: 10, unit: 'MINUTES') {
