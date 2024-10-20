@@ -70,13 +70,12 @@ podTemplate(
         def IMAGE_PATH = "${IMAGE_REG_HOST}/${IMAGE_REG_ORG}/${APP_NAME}"
 
         //-- 개발 시 CI/CD를 빠르게 하기 위해 일부 Stage Skip(sonar,trivy)
-        def skipStages = ""
+        def skipStages = "trivy"
 
         try {
             stage("Build React Scripts") {
                 container("node") {
                     sh """
-                        export REACT_APP_API_BASE_URL=${API_GATEWAY_FQDN}
                         npm install --only=production
                         npm run build --watch --watch-options-aggregate-timeout 1000
                     """
@@ -116,6 +115,7 @@ podTemplate(
                         --build-arg PROJECT_FOLDER=${PROJECT_DIR} \
                         --build-arg BUILD_FOLDER=${IMAGE_MANIFEST_DIR} \
                         --build-arg EXPORT_PORT=${SERVICE_PORT} \
+                        --build-arg REACT_APP_API_BASE_URL=${API_GATEWAY_FQDN} \
                         ${PROJECT_DIR}
                     """
                 }
@@ -154,7 +154,6 @@ podTemplate(
                     }
                 }
             }
-
 
             stage("Release Container image") {
                 container("podman") {
