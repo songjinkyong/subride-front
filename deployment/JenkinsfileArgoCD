@@ -133,18 +133,36 @@ podTemplate(
                         usernameVariable: 'USERNAME',
                         passwordVariable: 'PASSWORD'
                     )]) {
-                        sh """
-                            echo user "$USERNAME" pasword "$PASSWORD"
-                            podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
+                        script {
+                            def loginSuccess = false
+                            retry(3) {
+                                def loginStatus = sh(script: """
+                                    podman login ${IMAGE_REG_HOST} --username ${USERNAME} --password ${PASSWORD}
+                                """, returnStatus: true)
 
-                            podman push ${IMAGE_PATH}:${IMAGE_TAG}
+                                if (loginStatus == 0) {
+                                    loginSuccess = true
+                                    return
+                                } else {
+                                    error "Failed to login to registry. Retrying..."
+                                }
+                            }
 
-                            podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
-                            podman push ${IMAGE_PATH}:latest
-                        """
+                            if (!loginSuccess) {
+                                error "Failed to login after 3 attempts. Aborting."
+                            }
+
+                            // Proceed with push operations if login was successful
+                            sh """
+                                podman push ${IMAGE_PATH}:${IMAGE_TAG}
+
+                                podman tag ${IMAGE_PATH}:${IMAGE_TAG} ${IMAGE_PATH}:latest
+                                podman push ${IMAGE_PATH}:latest
+                            """
+                        }
                     }
                 }
-            }            
+            }         
 
             if(!skipStages.contains("trivy")) {
                 stage("Scan Image Vulnerability") {
