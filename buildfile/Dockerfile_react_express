@@ -28,8 +28,8 @@ COPY ${BUILD_FOLDER}/server.js .
 RUN npm install --only=production
 
 # 소스 코드를 작업 디렉토리에 복사합니다.
-COPY ./${PROJECT_FOLDER}/src .
-COPY ./${PROJECT_FOLDER}/public .
+COPY ./${PROJECT_FOLDER}/src ./src
+COPY ./${PROJECT_FOLDER}/public ./public
 #COPY ./${PROJECT_FOLDER}/node_modules .
 
 # React 애플리케이션을 빌드합니다.
