@@ -1,32 +1,32 @@
 # CI/CD pipeline 관련
-IMAGE_REG_CREDENTIAL=image_reg_credential_user15
+IMAGE_REG_CREDENTIAL=image_reg_credential_user12
 MANIFEST_FILENAME=subride-front.yaml
 IMAGE_SCAN_SEVERITY=CRITICAL,HIGH
-API_GATEWAY_FQDN=http://user15.scg.msa.edutdc.com
+API_GATEWAY_FQDN=http://user12.scg.msa.edutdc.com
 IMAGE_MANIFEST_DIR=buildfile
 PROJECT_DIR=.
-USE_ARGOCD=true
+USE_ARGOCD=false
 
 # ArgoCD 이용 시 
-GIT_ACCESS_CREDENTIAL=github_access_token_user15
-MANIFEST_REPO=github.com/hiondal/subrecommend-manifest.git
+GIT_ACCESS_CREDENTIAL=github_access_token_user12
+MANIFEST_REPO=github.com/songjinkyong/subrecommend-manifest.git
 MANIFEST_REPO_DIR=subrecommend-manifest
 MANIFEST_DIR=manifest
 
 # manifest 파일 환경 변수 
 APP_NAME=subride-front
-NAMESPACE=user15
+NAMESPACE=user12
 REPLICAS=2
-SERVICE_ACCOUNT=sa-user15
+SERVICE_ACCOUNT=sa-user12
 IMAGE_PULL_SECRET=dockerhub  
 IMAGE_REG_HOST=docker.io
-IMAGE_REG_ORG=hiondal
+IMAGE_REG_ORG=songjinkyong
 IMAGE_PULL_POLICY=Always
 CPU_REQUEST=256m
 MEMORY_REQUEST=256Mi
 CPU_LIMIT=500m 
 MEMORY_LIMIT=1024Mi
-EUREKA_URL=http://user15.eureka.msa.edutdc.com/eureka/apps/subrecommend-service
+EUREKA_URL=http://user12.eureka.msa.edutdc.com/eureka/apps/subrecommend-service
 STARTUP_DELAY=10
 STARTUP_FAILURE_THRESHOLD=10
 STARTUP_PERIOD=5
@@ -44,7 +44,7 @@ SERVICE_TYPE=ClusterIP
 SERVICE_PORT=3000 
 SSL_REDIRECT=false
 INGRESS_CLASS=nginx
-INGRESS_HOST=user15.subride-front.msa.edutdc.com  
+INGRESS_HOST=user12.subride-front.msa.edutdc.com  
 INGRESS_PATH=/
 INGRESS_PATH_TYPE=Prefix
 
