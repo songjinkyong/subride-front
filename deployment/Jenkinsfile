@@ -152,6 +152,9 @@ podTemplate(
                 stage("Scan Image Vulnerability") {
                     timeout(time: 10, unit: 'MINUTES') {
                         container("trivy") {
+                            environment {
+                                TRIVY_DISABLE_VEX_NOTICE = 'true'
+                            }
                             def trivyOutput = sh (
                                 script: """
                                     trivy image \
